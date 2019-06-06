@@ -12,14 +12,16 @@ import java.util.List;
 
 public class Visualiser {
 
+    private static final double pi = 3.1415d;
     private static JFrame frame;
 
     public static void main(String[] args) {
 
-        Triangle triangle1 = new Triangle(400, 100, 200, 400, 600, 400);
-        Triangle triangle2 = new Triangle(400, 500, 200, 200, 600, 200);
-        triangle1.setRotation(1f);
+        Triangle triangle1 = new Triangle(new Point(400, 300), 200, 0.0);
+        Triangle triangle2 = new Triangle(new Point(400, 300), 200, pi/3.0);
+        triangle1.setRotation(1.0d);
         triangle2.setDirection(new Point(60, 0));
+
 
         List<Triangle> triangles = new ArrayList<>();
         triangles.add(triangle1);

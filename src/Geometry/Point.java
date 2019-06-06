@@ -10,6 +10,10 @@ public class Point implements Comparable<Point>{
         this.y = y;
     }
 
+    public double getVectorLength(){
+        return Math.sqrt(x*x + y*y);
+    }
+
     public double getX() {
         return x;
     }
@@ -40,8 +44,7 @@ public class Point implements Comparable<Point>{
 
         Point point = (Point) o;
 
-        if (x != point.x) return false;
-        return y == point.y;
+        return x == point.x && y == point.y;
 
     }
 
