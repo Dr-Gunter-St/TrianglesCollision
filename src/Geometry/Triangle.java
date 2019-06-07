@@ -73,6 +73,10 @@ public class Triangle {
         direction = new Point(0, 0);
     }
 
+    public void collide(Triangle triangle){
+        //TODO: apply impulse-based collision response model
+    }
+
     public void tick(double fraction){
         rotate(fraction);
         translate(fraction);

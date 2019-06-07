@@ -10,9 +10,8 @@ import java.util.List;
 public class GamePanel extends JPanel implements Runnable{
 
         private boolean isRunning;
-        private Thread thread;
 
-        private static final int HEIGHT = 600;
+    private static final int HEIGHT = 600;
         private static final int WIDTH = 800;
 
         private static final int FPS = 60;
@@ -30,7 +29,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         private void start(){
             isRunning = true;
-            thread = new Thread(this);
+            Thread thread = new Thread(this);
             thread.start();
         }
 
@@ -39,7 +38,7 @@ public class GamePanel extends JPanel implements Runnable{
 
             long start, wait, elapsed, totalTime;
             int frameCount = 0;
-            totalTime = 0l;
+            totalTime = 0L;
             while (isRunning){
 
                 start = System.nanoTime();
@@ -51,7 +50,7 @@ public class GamePanel extends JPanel implements Runnable{
                 wait = 1000/FPS - elapsed;
 
                 try {
-                    thread.sleep(wait);
+                    Thread.sleep(wait);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -62,7 +61,7 @@ public class GamePanel extends JPanel implements Runnable{
                 if (frameCount == 60){
                     double avarageFPS = (1000/((totalTime/frameCount)/1000000));
                     frameCount = 0;
-                    totalTime = 0l;
+                    totalTime = 0L;
                 }
             }
 
@@ -80,8 +79,7 @@ public class GamePanel extends JPanel implements Runnable{
 
                     if (trianglesOverlapSAT(triangles.get(i), triangles.get(j))){
                         triangles.get(i).setColor(Color.RED);
-                        //triangles.get(i).setRotation(0);
-                        //triangles.get(i).setDirection(new Point(0.0f, 0.0f));
+                        triangles.get(i).collide(triangles.get(j));
                     } else {
                         triangles.get(i).setColor(Color.black);
                     }
