@@ -3,6 +3,7 @@ package Geometry;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Triangle {
 
@@ -11,6 +12,9 @@ public class Triangle {
     private Point a;
     private Point b;
     private Point c;
+
+    private Point collisionPoint;
+    private Line collisionSide;
 
     private int mass;
     private double rotation; // rad per second
@@ -75,6 +79,58 @@ public class Triangle {
 
     public void collide(Triangle triangle){
         //TODO: apply impulse-based collision response model
+
+        this.findCollisionPoint(triangle);
+        this.setSecondCollisionPoint(triangle);
+
+    }
+
+    //Super stupid
+    //Little better - finds side and point respectively
+    private void findCollisionPoint(Triangle triangle){
+        double dist = Double.MAX_VALUE;
+        double d;
+
+        for (Point p: triangle.getPoints()) {
+            for (Line side: getSides()) {
+                d = side.dist(p);
+
+                if (d < dist){
+                    dist = d;
+                    this.collisionSide = side;
+                    this.collisionPoint = null;
+                    triangle.collisionPoint = p;
+                    triangle.collisionSide = null;
+                }
+
+            }
+        }
+
+        for (Point p: this.getPoints()){
+            for (Line side: triangle.getSides()) {
+                d = side.dist(p);
+
+                if (d < dist){
+                    dist = d;
+                    triangle.collisionSide = side;
+                    triangle.collisionPoint = null;
+                    this.collisionPoint = p;
+                    this.collisionSide = null;
+                }
+            }
+        }
+
+
+
+    }
+
+    //sets collision point on the collision side of the respective triangle
+    private void setSecondCollisionPoint(Triangle triangle){
+        if (this.collisionPoint == null){
+            this.collisionPoint = this.collisionSide.closestPoint(triangle.collisionPoint);
+        } else {
+            triangle.collisionPoint = triangle.collisionSide.closestPoint(this.collisionPoint);
+        }
     }
 
     public void tick(double fraction){
@@ -215,6 +271,16 @@ public class Triangle {
 
     public int getMass() {
         return mass;
+    }
+
+    public List<Line> getSides(){
+        List<Line> sides = new ArrayList<>();
+
+        sides.add(new Line(a ,b, this));
+        sides.add(new Line(b ,c, this));
+        sides.add(new Line(c ,a, this));
+
+        return sides;
     }
 
 }

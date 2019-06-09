@@ -1,23 +1,44 @@
 package Geometry;
 
+import java.util.Map;
+
 public class Line {
 
-    private double m;
+    private double a;
     private double b;
+    private double c;
 
-    public Line(int m, int b){
-        this.m = m;
-        this.b = b;
+    private Point first;
+    private Point second;
+
+    private Triangle triangle;
+
+    public Line(Point a, Point b, Triangle triangle){
+
+        this.a = a.getY() - b.getY();
+        this.b = b.getX() - a.getX();
+        this.c = a.getX()*b.getY() - b.getX()*a.getY();
+
+        first = a;
+        second = b;
+
+        this.triangle = triangle;
     }
 
-    public Line(Point a, Point b){
+    public double dist(Point p){
+        return Math.abs(a*p.getX() + b*p.getY() + c)/Math.sqrt(a*a + b*b);
+    }
 
-        if (a.getX() == b.getX()) m = 0.0f;
-        else m = (float) (b.getY() - a.getY()) /(float) (b.getX() - a.getX());
+    public Point closestPoint(Point p){
+        double x, y;
 
-        this.b = a.getY() - m*a.getX();
+        x = (b*(b*p.getX() - a*p.getY()) - a*c)
+                /(a*a + b*b);
 
+        y = (a*(-b*p.getX() + a*p.getY()) - b*c)
+                /(a*a + b*b);
 
+        return new Point(x, y);
     }
 
 }
