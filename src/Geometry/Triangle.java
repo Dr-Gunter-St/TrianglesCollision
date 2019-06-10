@@ -190,11 +190,17 @@ public class Triangle {
             rMomentum = rMomentum/(proportion + 1.0);
             this.rotation = - Math.signum(rotation)*rMomentum;
             triangle.rotation = - Math.signum(triangle.rotation)*rMomentum*proportion;
+
+            this.rotation = this.rotation/this.momentOfInertia;
+            triangle.rotation = triangle.rotation/triangle.momentOfInertia;
         } else {
             proportion = 1/proportion;
             rMomentum = rMomentum/(proportion + 1.0);
             triangle.rotation = - Math.signum(triangle.rotation)*rMomentum;
             this.rotation = - Math.signum(rotation)*rMomentum*proportion;
+
+            this.rotation = this.rotation/this.momentOfInertia;
+            triangle.rotation = triangle.rotation/triangle.momentOfInertia;
         }
 
         if (this.A != null){
