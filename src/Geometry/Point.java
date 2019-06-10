@@ -10,8 +10,39 @@ public class Point implements Comparable<Point>{
         this.y = y;
     }
 
+    public Point(Point a, Point b){
+        x = b.x - a.x;
+        y = b.y - a.y;
+    }
+
     public double getVectorLength(){
         return Math.sqrt(x*x + y*y);
+    }
+
+    public Point multiply(double d){
+        x *= d;
+        y *= d;
+
+        return new Point(x, y);
+    }
+
+    public static Point v_summ(Point a, Point b){
+        return new Point(a.x + b.x, a.y + b.y);
+    }
+
+    public static double scalar_product(Point a, Point b){
+        return a.x*b.x + a.y*b.y;
+    }
+
+    public static Point clone(Point p){
+        return new Point(p.x, p.y);
+    }
+
+    public void setLength(double d){
+        double len = Math.sqrt(x*x + y*y);
+
+        x = (x/len)*d;
+        y = (y/len)*d;
     }
 
     public double getX() {

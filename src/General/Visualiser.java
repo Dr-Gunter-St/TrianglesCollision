@@ -23,7 +23,7 @@ public class Visualiser {
         triangle1.setRotation(1.0d);
         triangle2.setDirection(new Point(60, 0));
 
-        Point p1 = new Point(100.0, 200.0);
+       Point p1 = new Point(100.0, 200.0);
         Point p2 = new Point(200.0, 100.0);
         Point p3 = new Point(150.0, 150.0);
 

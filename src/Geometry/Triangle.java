@@ -3,7 +3,6 @@ package Geometry;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class Triangle {
 
@@ -15,6 +14,7 @@ public class Triangle {
 
     private Point collisionPoint;
     private Line collisionSide;
+    private Point A; // Center - collisionPoint; VECTOR
 
     private int mass;
     private double rotation; // rad per second
@@ -29,6 +29,10 @@ public class Triangle {
     private double momentOfInertia; // for Equilateral triangles equals mass * side_length^2 / 12
     private double rotationalMomentum;
     private double rotKEn;
+
+    private Point v_totalMomentum;
+    private Point v_translMomentum;
+    private Point v_rotationalMomentum;
 
     //public Triangle(Point a, Point b, Point c, int mass, int velocity, int rotation, Vector direction)
 
@@ -82,6 +86,9 @@ public class Triangle {
 
         this.findCollisionPoint(triangle);
         this.setSecondCollisionPoint(triangle);
+        this.summupMomentums(triangle); // total momentum found
+
+
 
     }
 
@@ -128,9 +135,52 @@ public class Triangle {
     private void setSecondCollisionPoint(Triangle triangle){
         if (this.collisionPoint == null){
             this.collisionPoint = this.collisionSide.closestPoint(triangle.collisionPoint);
+            triangle.A = new Point(triangle.getCentroid(), triangle.collisionPoint);
         } else {
             triangle.collisionPoint = triangle.collisionSide.closestPoint(this.collisionPoint);
+            this.A = new Point(this.getCentroid(), this.collisionPoint);
         }
+    }
+
+    //Tricky part
+    private void summupMomentums(Triangle triangle){
+        this.v_translMomentum = new Point(this.direction.getX(), this.direction.getY()).multiply((double) this.mass);
+        triangle.v_translMomentum = new Point(triangle.direction.getX(), triangle.direction.getY()).multiply((double) triangle.mass);
+
+        double rotM = this.rotationalMomentum + triangle.rotationalMomentum;
+        Point wholeTranslMomentum = Point.v_summ(this.v_translMomentum, triangle.v_translMomentum);
+
+        Point wholeRotMomentum = Point.clone(wholeTranslMomentum);
+
+        if (rotM >= 0){
+            wholeRotMomentum = rotatePoint(wholeRotMomentum, new Point(0.0, 0.0), pi/2.0);
+        } else {
+            wholeRotMomentum = rotatePoint(wholeRotMomentum, new Point(0.0, 0.0), -pi/2.0);
+        }
+
+        wholeRotMomentum.setLength(rotM);
+
+        this.v_totalMomentum = Point.v_summ(wholeTranslMomentum, wholeRotMomentum);
+        triangle.v_totalMomentum = this.v_totalMomentum;
+
+
+    }
+
+    //One more tricky part
+    private void divideAndApplyMomentum(Triangle triangle){
+        Point divTranslMomentum;
+        Point divRotMomentum;
+
+        if (this.A != null){
+            divTranslMomentum = A.multiply(Point.scalar_product(v_totalMomentum, A)/Point.scalar_product(A, new Point(A.getY(), A.getX())));
+            divRotMomentum = new Point(v_totalMomentum, divTranslMomentum);
+        } else {
+            divTranslMomentum = triangle.A.multiply(Point.scalar_product(v_totalMomentum, triangle.A)/Point.scalar_product(triangle.A, new Point(triangle.A.getY(), triangle.A.getX())));
+            divRotMomentum = new Point(v_totalMomentum, divTranslMomentum);
+        }
+
+
+        //TODO: apply momentums to triangles
     }
 
     public void tick(double fraction){
