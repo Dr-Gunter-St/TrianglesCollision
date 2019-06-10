@@ -172,15 +172,41 @@ public class Triangle {
         Point divRotMomentum;
 
         if (this.A != null){
-            divTranslMomentum = A.multiply(Point.scalar_product(v_totalMomentum, A)/Point.scalar_product(A, new Point(A.getY(), A.getX())));
+            divTranslMomentum = A.multiply(Point.scalar_product(v_totalMomentum, A)/Point.scalar_product(A, new Point(A.getY(), A.getX()))); // Gram-Schmidt
             divRotMomentum = new Point(v_totalMomentum, divTranslMomentum);
         } else {
-            divTranslMomentum = triangle.A.multiply(Point.scalar_product(v_totalMomentum, triangle.A)/Point.scalar_product(triangle.A, new Point(triangle.A.getY(), triangle.A.getX())));
+            divTranslMomentum = triangle.A.multiply(Point.scalar_product(v_totalMomentum, triangle.A)/Point.scalar_product(triangle.A, new Point(triangle.A.getY(), triangle.A.getX()))); // Gram-Schmidt
             divRotMomentum = new Point(v_totalMomentum, divTranslMomentum);
         }
 
 
         //TODO: apply momentums to triangles
+        // Shouldn't`t work, just a cry of despair
+        // The most stupid part
+
+        double rMomentum = divRotMomentum.getVectorLength();
+        double proportion = this.mass/triangle.mass; // masses should be > 0
+        if (proportion > 0.0){
+            rMomentum = rMomentum/(proportion + 1.0);
+            this.rotation = - Math.signum(rotation)*rMomentum;
+            triangle.rotation = - Math.signum(triangle.rotation)*rMomentum*proportion;
+        } else {
+            proportion = 1/proportion;
+            rMomentum = rMomentum/(proportion + 1.0);
+            triangle.rotation = - Math.signum(triangle.rotation)*rMomentum;
+            this.rotation = - Math.signum(rotation)*rMomentum*proportion;
+        }
+
+        if (this.A != null){
+            this.direction = divTranslMomentum;
+            triangle.A = new Point(triangle.getCentroid(), triangle.collisionPoint);
+            triangle.direction = triangle.A.multiply(Point.scalar_product(v_totalMomentum, triangle.A)/Point.scalar_product(triangle.A, new Point(triangle.A.getY(), triangle.A.getX()))); // Gram-Schmidt
+        } else {
+            triangle.direction = divRotMomentum;
+            this.A = new Point(getCentroid(), collisionPoint);
+            this.direction = A.multiply(Point.scalar_product(v_totalMomentum, A)/Point.scalar_product(A, new Point(A.getY(), A.getX()))); // Gram-Schmidt
+        }
+
     }
 
     public void tick(double fraction){
@@ -232,14 +258,14 @@ public class Triangle {
         this.momentum = mass*velocity;
         this.kEn = momentum*velocity/2.0;
         this.momentOfInertia = mass*getSideL()*getSideL()/12;
-        this.rotationalMomentum = momentOfInertia*rotation;
-        this.rotKEn = momentOfInertia*rotation*rotation/2.0;
+        this.rotationalMomentum = momentOfInertia*Math.abs(rotation);
+        this.rotKEn = momentOfInertia*Math.abs(rotation)*Math.abs(rotation)/2.0;
     }
 
     public void setRotation(double radPerSec) {
         this.rotation = radPerSec;
-        this.rotationalMomentum = momentOfInertia*rotation;
-        this.rotKEn = momentOfInertia*rotation*rotation/2.0;
+        this.rotationalMomentum = momentOfInertia*Math.abs(rotation);
+        this.rotKEn = momentOfInertia*Math.abs(rotation)*Math.abs(rotation)/2.0;
     }
 
     public void setDirection(Point direction) {
