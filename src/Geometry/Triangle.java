@@ -31,6 +31,7 @@ public class Triangle {
     private double rotKEn;
 
     private Point v_totalMomentum;
+    private Point v_ownTotalMomentum;
     private Point v_translMomentum;
     private Point v_rotationalMomentum;
 
@@ -167,7 +168,8 @@ public class Triangle {
     }
 
     //One more tricky part
-    private void divideAndApplyMomentum(Triangle triangle){
+    //Gibberish
+   /* private void divideAndApplyMomentum(Triangle triangle){
         Point divTranslMomentum;
         Point divRotMomentum;
 
@@ -213,7 +215,36 @@ public class Triangle {
             this.direction = A.multiply(Point.scalar_product(v_totalMomentum, A)/Point.scalar_product(A, new Point(A.getY(), A.getX()))); // Gram-Schmidt
         }
 
-    }
+    }*/
+
+   private void divideAndApplyMomentum(Triangle triangle) {
+
+       v_ownTotalMomentum = v_totalMomentum.multiply(mass/(mass + triangle.mass));
+       triangle.v_ownTotalMomentum = v_totalMomentum.multiply((triangle.mass/(mass + triangle.mass)));
+
+       if (this.A != null) {
+          triangle.A = new Point(triangle.getCentroid(), triangle.collisionPoint);
+       } else {
+           A = new Point(getCentroid(), collisionPoint);
+       }
+
+       v_translMomentum = applyGram_Schmidt(v_ownTotalMomentum, A);
+       v_rotationalMomentum = new Point(v_ownTotalMomentum, v_translMomentum);
+       triangle.v_translMomentum = applyGram_Schmidt(triangle.v_ownTotalMomentum, triangle.A);
+       triangle.v_rotationalMomentum = new Point(triangle.v_ownTotalMomentum, triangle.v_translMomentum);
+
+       this.direction = v_translMomentum.multiply(1.0/(double)mass);
+       triangle.direction = triangle.v_translMomentum.multiply(1.0/(double)triangle.mass);
+
+       this.rotation = - Math.signum(rotation) * (v_rotationalMomentum.getVectorLength() / momentOfInertia);
+       triangle.rotation = - Math.signum(triangle.rotation) * (triangle.v_rotationalMomentum.getVectorLength() / triangle.momentOfInertia);
+   }
+
+   private Point applyGram_Schmidt(Point what, Point on){
+       Point projection = on.multiply(Point.scalar_product(what, on) / Point.scalar_product(on, new Point(on.getY(), on.getX())));
+
+       return new Point(projection.getX(), projection.getY());
+   }
 
     public void tick(double fraction){
         rotate(fraction);
