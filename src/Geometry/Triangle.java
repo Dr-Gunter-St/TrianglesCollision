@@ -35,6 +35,10 @@ public class Triangle {
     private Point v_translMomentum;
     private Point v_rotationalMomentum;
 
+    private boolean collided = false;
+
+    private static final double sideLength = 1.0;
+
     //public Triangle(Point a, Point b, Point c, int mass, int velocity, int rotation, Vector direction)
 
 
@@ -88,9 +92,14 @@ public class Triangle {
         this.findCollisionPoint(triangle);
         this.setSecondCollisionPoint(triangle);
         this.summupMomentums(triangle); // total momentum found
+        this.divideAndApplyMomentum(triangle);
+        this.cleanUp(triangle);
 
+        this.collided = true;
+        triangle.collided = true;
 
-
+        System.out.println(this);
+        System.out.println(triangle);
     }
 
     //Super stupid
@@ -219,8 +228,8 @@ public class Triangle {
 
    private void divideAndApplyMomentum(Triangle triangle) {
 
-       v_ownTotalMomentum = v_totalMomentum.multiply(mass/(mass + triangle.mass));
-       triangle.v_ownTotalMomentum = v_totalMomentum.multiply((triangle.mass/(mass + triangle.mass)));
+       v_ownTotalMomentum = v_totalMomentum.multiply((double) mass/(double) (mass + triangle.mass));
+       triangle.v_ownTotalMomentum = v_totalMomentum.multiply(((double) triangle.mass/(double)(mass + triangle.mass)));
 
        if (this.A != null) {
           triangle.A = new Point(triangle.getCentroid(), triangle.collisionPoint);
@@ -228,20 +237,43 @@ public class Triangle {
            A = new Point(getCentroid(), collisionPoint);
        }
 
-       v_translMomentum = applyGram_Schmidt(v_ownTotalMomentum, A);
+       v_translMomentum = project(v_ownTotalMomentum, A);
        v_rotationalMomentum = new Point(v_ownTotalMomentum, v_translMomentum);
-       triangle.v_translMomentum = applyGram_Schmidt(triangle.v_ownTotalMomentum, triangle.A);
+       triangle.v_translMomentum = project(triangle.v_ownTotalMomentum, triangle.A);
        triangle.v_rotationalMomentum = new Point(triangle.v_ownTotalMomentum, triangle.v_translMomentum);
 
        this.direction = v_translMomentum.multiply(1.0/(double)mass);
        triangle.direction = triangle.v_translMomentum.multiply(1.0/(double)triangle.mass);
 
-       this.rotation = - Math.signum(rotation) * (v_rotationalMomentum.getVectorLength() / momentOfInertia);
-       triangle.rotation = - Math.signum(triangle.rotation) * (triangle.v_rotationalMomentum.getVectorLength() / triangle.momentOfInertia);
+       this.rotation =  Math.signum(rotation) * (v_rotationalMomentum.getVectorLength() / momentOfInertia); //TODO: apply some checks
+       triangle.rotation =  Math.signum(triangle.rotation) * (triangle.v_rotationalMomentum.getVectorLength() / triangle.momentOfInertia);
    }
 
-   private Point applyGram_Schmidt(Point what, Point on){
-       Point projection = on.multiply(Point.scalar_product(what, on) / Point.scalar_product(on, new Point(on.getY(), on.getX())));
+   private void cleanUp(Triangle triangle){
+       collisionPoint = null;
+       collisionSide = null;
+       A = null;
+
+       v_totalMomentum = null;
+       v_ownTotalMomentum = null;
+       v_translMomentum = null;
+       v_rotationalMomentum = null;
+
+       triangle.collisionPoint = null;
+       triangle.collisionSide = null;
+       triangle.A = null;
+
+       triangle.v_totalMomentum = null;
+       triangle.v_ownTotalMomentum = null;
+       triangle.v_translMomentum = null;
+       triangle.v_rotationalMomentum = null;
+   }
+
+   public Point project(Point what, Point on){
+
+       double scP = Point.scalar_product(what, on);
+       double lSq = on.getVectorLength() * on.getVectorLength();
+       Point projection = on.multiply(scP / lSq);
 
        return new Point(projection.getX(), projection.getY());
    }
@@ -294,7 +326,7 @@ public class Triangle {
         this.mass = mass;
         this.momentum = mass*velocity;
         this.kEn = momentum*velocity/2.0;
-        this.momentOfInertia = mass*getSideL()*getSideL()/12;
+        this.momentOfInertia = mass*sideLength*sideLength/12.0;   //this.momentOfInertia = mass*getSideL()*getSideL()/12;
         this.rotationalMomentum = momentOfInertia*Math.abs(rotation);
         this.rotKEn = momentOfInertia*Math.abs(rotation)*Math.abs(rotation)/2.0;
     }
@@ -335,15 +367,6 @@ public class Triangle {
 
         return new Point(temp1, temp2);
 
-    }
-
-    @Override
-    public String toString() {
-        return "Triangle{" +
-                "a=" + a +
-                ", b=" + b +
-                ", c=" + c +
-                '}';
     }
 
     private double getSideL(){
@@ -396,4 +419,19 @@ public class Triangle {
         return sides;
     }
 
+    public boolean isCollided() {
+        return collided;
+    }
+
+    @Override
+    public String toString() {
+        return "Triangle{" +
+                "a=" + a +
+                ", b=" + b +
+                ", c=" + c +
+                ", mass=" + mass +
+                ", rotation=" + rotation +
+                ", direction=" + direction +
+                '}';
+    }
 }

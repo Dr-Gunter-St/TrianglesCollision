@@ -20,10 +20,10 @@ public class Point implements Comparable<Point>{
     }
 
     public Point multiply(double d){
-        x *= d;
-        y *= d;
+        double newX = x*d;
+        double newY = y * d;
 
-        return new Point(x, y);
+        return new Point(newX, newY);
     }
 
     public static Point v_summ(Point a, Point b){

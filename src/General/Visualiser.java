@@ -18,21 +18,21 @@ public class Visualiser {
 
     public static void main(String[] args) {
 
-        Triangle triangle1 = new Triangle(new Point(GamePanel.WIDTH/2, GamePanel.HEIGHT/2), 200, 0.0);
-        Triangle triangle2 = new Triangle(new Point(GamePanel.WIDTH/2, GamePanel.HEIGHT/2), 200, pi/3.0);
+        Triangle triangle1 = new Triangle(new Point(1200, GamePanel.HEIGHT/2), 200, 0.0);
+        Triangle triangle2 = new Triangle(new Point(100, GamePanel.HEIGHT/2), 200, pi/3.0);
         triangle1.setRotation(1.0d);
+        triangle1.setMass(1);
         triangle2.setDirection(new Point(60, 0));
+        triangle2.setMass(2);
 
-       Point p1 = new Point(100.0, 200.0);
-        Point p2 = new Point(200.0, 100.0);
+       Point p1 = new Point(300.0, 300.0);
+        Point p2 = new Point(300.0, 000.0);
         Point p3 = new Point(150.0, 150.0);
 
-        Line  line = new Line(p1, p2, triangle1);
-        System.out.println(line.dist(p3));
-        System.out.println(line.closestPoint(p3));
+        //System.out.println(triangle1.project(p1, p2));
 
 
-        /*List<Triangle> triangles = new ArrayList<>();
+       List<Triangle> triangles = new ArrayList<>();
         triangles.add(triangle1);
         triangles.add(triangle2);
 
@@ -44,7 +44,7 @@ public class Visualiser {
         frame.add(gamePanel, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);*/
+        frame.setVisible(true);
 
     }
 

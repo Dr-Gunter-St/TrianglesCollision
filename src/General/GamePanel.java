@@ -71,21 +71,11 @@ public class GamePanel extends JPanel implements Runnable{
 
         private void tick(double fraction){
 
-            for (int i = 0; i < triangles.size(); i++) {
-
-                for (int j = 0; j < triangles.size(); j++) {
-
-                    if (i == j) continue;
-
-                    if (trianglesOverlapSAT(triangles.get(i), triangles.get(j))){
-                        triangles.get(i).setColor(Color.RED);
-                        triangles.get(i).collide(triangles.get(j));
-                    } else {
-                        triangles.get(i).setColor(Color.black);
-                    }
-
-                }
-
+            if (trianglesOverlapSAT(triangles.get(0), triangles.get(1)) && !triangles.get(0).isCollided()){
+                triangles.forEach(triangle -> triangle.setColor(Color.RED));
+                triangles.get(0).collide(triangles.get(1));
+            } else {
+                triangles.forEach(triangle -> triangle.setColor(Color.BLACK));
             }
 
             for (Triangle tr: triangles) {
